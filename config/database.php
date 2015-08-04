@@ -54,10 +54,10 @@ return [
 
         'mysql' => [
             'driver'    => 'mysql',
-            'host'      => env('DB_HOST', 'localhost'),
-            'database'  => env('DB_DATABASE', 'market-fair'),
-            'username'  => env('DB_USERNAME', 'root'),
-            'password'  => env('DB_PASSWORD', ''),
+            'host'      => env('DB_HOST', 'us-cdbr-iron-east-02.cleardb.net'),
+            'database'  => env('DB_DATABASE', 'mysql'),
+            'username'  => env('DB_USERNAME', 'b7fcaeee480801'),
+            'password'  => env('DB_PASSWORD', 'd73230df'),
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
