@@ -2,24 +2,24 @@
 
 namespace App\Handlers\Events;
 
-use App\Events\CurrencyMessageReceived;
+use App\Events\CurrencyMessageReceived as CurrencyMessageReceivedEvent;
 use App\MonthlyRate;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\DB;
 use LRedis;
 
-class CurrencyMessageReceivedHandler implements ShouldQueue
+class CurrencyMessageReceived implements ShouldQueue
 {
     use InteractsWithQueue;
 
     /**
      * Handle the event.
      *
-     * @param CurrencyMessageReceived
+     * @param CurrencyMessageReceivedEvent
      * @return void
      */
-    public function handle(CurrencyMessageReceived $event)
+    public function handle(CurrencyMessageReceivedEvent $event)
     {
         $timePlaced = new \DateTime($event->message->time_placed);
         $rate = MonthlyRate::where('year', $timePlaced->format('Y'))

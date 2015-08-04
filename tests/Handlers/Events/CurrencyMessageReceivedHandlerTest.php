@@ -1,9 +1,6 @@
 <?php
 
-use Illuminate\Foundation\Testing\WithoutMiddleware;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use App\Handlers\Events\CurrencyMessageReceivedHandler;
+use App\Handlers\Events\CurrencyMessageReceived as CurrencyMessageReceivedHandler;
 use \App\Events\CurrencyMessageReceived;
 use \App\CurrencyMessage;
 

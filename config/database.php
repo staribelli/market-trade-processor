@@ -1,9 +1,15 @@
 <?php
+// Ugly but that's how heroku stores credentials
 $url = parse_url(getenv("CLEARDB_DATABASE_URL"));
 $host = $url["host"];
 $username = $url["user"];
 $password = $url["pass"];
 $database = substr($url["path"], 1);
+
+// temp
+$host = 'localhost';
+$username = 'root';
+$database = 'market-fair';
 
 $redisUrl = parse_url(getenv("CLEARDB_DATABASE_URL"));
 $redisHost = $redisUrl['host'];
@@ -128,11 +134,14 @@ return [
         'cluster' => false,
 
         'default' => [
-            'host'     => 'pub-redis-13246.us-east-1-3.6.ec2.redislabs.com',
-            'port'     => 13246,
-            'password' => '3OX4CdGnAYKStTEZ',
-            'username' => 'rediscloud',
-            'database' => 'redis',
+//            'host'     => 'pub-redis-13246.us-east-1-3.6.ec2.redislabs.com',
+            'host'     => '127.0.0.1',
+//            'port'     => 13246,
+            'port'     => 6379,
+//            'password' => '3OX4CdGnAYKStTEZ',
+//            'username' => 'rediscloud',
+//            'database' => 'redis',
+            'database' => '0',
         ],
 
     ],

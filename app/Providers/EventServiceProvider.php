@@ -5,7 +5,7 @@ namespace App\Providers;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use App\Events\CurrencyMessageReceived;
-use App\Handlers\Events\CurrencyMessageReceivedHandler;
+use App\Handlers\Events\CurrencyMessageReceived as CurrencyMessageReceivedHandler;
 
 class EventServiceProvider extends ServiceProvider
 {

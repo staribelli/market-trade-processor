@@ -27,6 +27,7 @@ return [
     */
 
     'url' => 'http://markettradeprocessor/',
+    'nodeUrl' => 'http://localhost:8890',
 
     /*
     |--------------------------------------------------------------------------

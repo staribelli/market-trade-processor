@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\CurrencyMessage;
 use App\Events\CurrencyMessageReceived;
-use App\MonthlyRate;
 use Event;
 use Illuminate\Http\Request;
 use App\Http\Requests;
@@ -15,7 +14,8 @@ use LRedis;
 class CurrencymessageController extends Controller
 {
     /**
-     * Display the messages..
+     * Init the index view with the current
+     * average rate data stored in the db.
      *
      * @return Response
      */
@@ -32,38 +32,35 @@ class CurrencymessageController extends Controller
             ->orderBy('currency_to')
             ->get();
 
-        $messages = [];
-        $prevCurFrom = null;
-        $prevCurTo = null;
+        // Initialize the messages array as charts.js expects it
+        if (empty($rates))
+        {
+            $messages = [[]];
+        } else {
+            $messages = [];
+        }
+
         $monthRates = [];
-        $key = '';
+        $totRates = count($rates);
 
         // Aggregate the messages as an array
         // currencyfrom_currencyto => [1 => avg_rate, 2 => ...]
         // where the inner array index corresponds to a month
-        for ($i = 0; $i < count($rates); $i++)
-        {
+        for ($i = 0; $i < $totRates; $i++) {
             $rate = $rates[$i];
             $monthRates[$rate->month] = $rate->avg_rate;
 
-            if ($rate->currency_from != $prevCurFrom
-                || $rate->currency_to != $prevCurTo)
-            {
-                $prevCurFrom = $rate->currency_from;
-                $prevCurTo = $rate->currency_to;
-
-                // Build the array key
-                $key = $prevCurFrom . '-' . $prevCurTo;
-
+            if ($i == $totRates - 1) {
+                $key = $rate->currency_from . '-' . $rate->currency_to;
                 $messages[$key] = $monthRates;
-                $monthRates = [];
-
             }
-
-            if ($i == count($rates) - 1)
+            elseif ($rate->currency_from != $rates[$i + 1]->currency_from
+                    || $rate->currency_to != $rates[$i + 1]->currency_to)
             {
-                $key = $prevCurFrom . '-' . $prevCurTo;
-                $messages[$key] = $messages[$key] + $monthRates;
+                        // Build the array key and store the data
+                        $key = $rate->currency_from . '-' . $rate->currency_to;
+                        $messages[$key] = $monthRates;
+                        $monthRates = [];
             }
         }
 
@@ -71,15 +68,16 @@ class CurrencymessageController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
-     *
+     * Store the message received from the api call
+     * POST /messages
      * @return Response
      */
     public function store(Request $request)
     {
         if ($request->isJson())
         {
-            $validator = $this->getValidationFactory()->make($this->formatInput($request->all()), [
+            $input = $this->formatInput($request->all());
+            $validator = $this->getValidationFactory()->make($input, [
                 'userId' => 'required',
                 'currencyFrom' => 'required',
                 'currencyTo' => 'required',
@@ -97,7 +95,7 @@ class CurrencymessageController extends Controller
 
                 try {
                     $message = new CurrencyMessage();
-                    $request = (object)$request;
+                    $request = (object)$input;
                     $message->user_id = $request->userId;
                     $message->currency_from = $request->currencyFrom;
                     $message->currency_to = $request->currencyTo;
@@ -128,26 +126,18 @@ class CurrencymessageController extends Controller
         }
     }
 
-    // todo: make an helper
+    /**
+     * Removes trailing and ending spaces from
+     * each input value;
+     *
+     * @param $request
+     * @return array
+     */
     protected function formatInput($request)
     {
-        // Remove the empty spaces from the beginning and end of each param
         $request = array_map('trim', $request);
 
         return $request;
     }
 
-//    public function test()
-//    {
-//        return view('test');
-//    }
-//
-//    public function testEvent()
-//    {
-//        $podcast = CurrencyMessage::first();
-//
-//        // Purchase podcast logic...
-//
-//        Event::fire(new CurrencyMessageReceived($podcast));
-//    }
 }
