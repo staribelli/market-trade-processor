@@ -5,6 +5,10 @@ $username = $url["user"];
 $password = $url["pass"];
 $database = substr($url["path"], 1);
 
+$redisHost = parse_url($_ENV['REDISCLOUD_URL'], PHP_URL_HOST);
+$redisPport = parse_url($_ENV['REDISCLOUD_URL'], PHP_URL_PORT);
+$redisPassword = parse_url($_ENV['REDISCLOUD_URL'], PHP_URL_PASS);
+
 return [
 
     /*
@@ -121,8 +125,9 @@ return [
         'cluster' => false,
 
         'default' => [
-            'host'     => '127.0.0.1',
-            'port'     => 6379,
+            'host'     => $redisHost,
+            'port'     => $redisPort,
+            'password' => $redisPassword,
             'database' => 0,
         ],
 
