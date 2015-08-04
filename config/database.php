@@ -5,9 +5,12 @@ $username = $url["user"];
 $password = $url["pass"];
 $database = substr($url["path"], 1);
 
-$redisHost = parse_url($_ENV['REDISCLOUD_URL'], PHP_URL_HOST);
-$redisPport = parse_url($_ENV['REDISCLOUD_URL'], PHP_URL_PORT);
-$redisPassword = parse_url($_ENV['REDISCLOUD_URL'], PHP_URL_PASS);
+$redisUrl = parse_url(getenv("CLEARDB_DATABASE_URL"));
+$redisHost = $redisUrl['host'];
+$redisUser = $redisUrl['user'];
+$redisPport = $redisUrl['port'];
+$redisPassword = $redisUrl['pass'];
+$redisDatabase = $redisUrl['scheme'];
 
 return [
 
@@ -128,6 +131,7 @@ return [
             'host'     => $redisHost,
             'port'     => $redisPort,
             'password' => $redisPassword,
+            'username' => $redisUser,
             'database' => 0,
         ],
 
