@@ -128,11 +128,11 @@ return [
         'cluster' => false,
 
         'default' => [
-            'host'     => $redisHost,
-            'port'     => $redisPort,
-            'password' => $redisPassword,
-            'username' => $redisUser,
-            'database' => 0,
+            'host'     => 'pub-redis-13246.us-east-1-3.6.ec2.redislabs.com',
+            'port'     => 13246,
+            'password' => '3OX4CdGnAYKStTEZ',
+            'username' => 'rediscloud',
+            'database' => 'redis',
         ],
 
     ],
