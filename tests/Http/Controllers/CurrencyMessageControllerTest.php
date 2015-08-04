@@ -1,19 +1,24 @@
 <?php
 
-use Illuminate\Foundation\Testing\WithoutMiddleware;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-
-class CurrencyControllerTest extends TestCase
+class CurrencyMessageControllerTest extends TestCase
 {
+    public function testStore_unauthorized()
+    {
+        $this->post('/messages')
+            ->seeStatusCode(401);
+    }
+
     public function testStore_bad_request()
     {
+        // Disable the auth
+        $this->withoutMiddleware();
         $this->post('/messages')
                 ->seeStatusCode(400);
     }
 
     public function testStore_fails_validation()
     {
+        $this->withoutMiddleware();
         $this->call('POST', '/messages', [], [], [], ['CONTENT_TYPE' => 'application/json']);
         $this->seeStatusCode(400)
             ->seeJsonEquals([
@@ -28,8 +33,11 @@ class CurrencyControllerTest extends TestCase
             ]);
     }
 
-    public function _testStore_ok()
+    public function testStore_ok()
     {
+        $this->markTestIncomplete("Laravel's function is not sending the proper headers and data and the curl request does not set the app as testing");
+        $this->withoutMiddleware();
+
         $data = [
             "amountBuy" => 100,
             "amountSell" => 200,
@@ -41,7 +49,7 @@ class CurrencyControllerTest extends TestCase
             "userId" => 1
         ];
 
-        // Laravel's function is not sending the proper headers. make a curl request instead
+        // Laravel's function is not sending the proper headers and data. make a curl request instead
         $curl = curl_init();
         curl_setopt_array(
             $curl, array(
@@ -49,25 +57,15 @@ class CurrencyControllerTest extends TestCase
                 CURLOPT_URL            => $this->baseUrl . '/index.php/messages',
                 CURLOPT_POST           => 1,
                 CURLOPT_POSTFIELDS     => json_encode($data),
-                CURLOPT_HTTPHEADER     => ['Content-Type: application/json']
+                CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+                CURLOPT_USERPWD        => 'user@marketfair.com:processor'
             )
         );
 
-        $response = curl_exec($curl);
+        curl_exec($curl);
+        $requestInfo = curl_getinfo($curl);
         curl_close($curl);
 
-        var_dump($response);
-echo         bcrypt('processor');
-        $this->call('POST', '/messages', $data, [], [], ['CONTENT_TYPE' => 'application/json']);
-        $this->seeStatusCode(400)
-            ->seeJsonEquals([
-                "amountSell" => ["The amount sell field is required."],
-                "currencyFrom" => ["The currency from field is required."],
-                "currencyTo" => ["The currency to field is required."],
-                "originatingCountry" => ["The originating country field is required."],
-                "rate" => ["The rate field is required."],
-                "timePlaced" => ["The time placed field is required."],
-                "userId" => ["The user id field is required."]
-            ]);
+        $this->assertEquals(201, $requestInfo['http_code']);
     }
 }

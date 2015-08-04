@@ -13,6 +13,8 @@ class CurrencyMessageReceived implements ShouldQueue
 {
     use InteractsWithQueue;
 
+    const REDIS_MESSAGE_KEY = 'message';
+
     /**
      * Handle the event.
      *
@@ -53,8 +55,7 @@ class CurrencyMessageReceived implements ShouldQueue
                 ]
             ];
             // Push message in redis to be displayed in the frontend
-            $redis = LRedis::connection();
-            $redis->publish('message', json_encode($message));
+            $this->pushToSocket($message);
 
             DB::commit();
         } catch (\ErrorException $e) {
@@ -68,5 +69,11 @@ class CurrencyMessageReceived implements ShouldQueue
 
             throw $e;
         }
+    }
+
+    protected function pushToSocket($message)
+    {
+        $redis = LRedis::connection();
+        $redis->publish(self::REDIS_MESSAGE_KEY, json_encode($message));
     }
 }

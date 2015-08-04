@@ -1,22 +1,33 @@
 <?php
 // Ugly but that's how heroku stores credentials
-$url = parse_url(getenv("CLEARDB_DATABASE_URL"));
-$host = $url["host"];
-$username = $url["user"];
-$password = $url["pass"];
-$database = substr($url["path"], 1);
+if (!empty(getenv("CLEARDB_DATABASE_URL"))) {
+    $url = parse_url(getenv("CLEARDB_DATABASE_URL"));
+    $host = $url["host"];
+    $username = $url["user"];
+    $password = $url["pass"];
+    $database = substr($url["path"], 1);
+} else {
+    $host = '';
+    $username = '';
+    $password = '';
+    $database = '';
+}
 
-// temp
-$host = 'localhost';
-$username = 'root';
-$database = 'market-fair';
-
-$redisUrl = parse_url(getenv("CLEARDB_DATABASE_URL"));
-$redisHost = $redisUrl['host'];
-$redisUser = $redisUrl['user'];
-$redisPport = $redisUrl['port'];
-$redisPassword = $redisUrl['pass'];
-$redisDatabase = $redisUrl['scheme'];
+if (!empty(getenv("CLEARDB_DATABASE_URL"))) {
+    $redisUrl = parse_url(getenv("CLEARDB_DATABASE_URL"));
+    $redisHost = $redisUrl['host'];
+    $redisUser = $redisUrl['user'];
+    $redisPport = $redisUrl['port'];
+    $redisPassword = $redisUrl['pass'];
+    $redisDatabase = $redisUrl['scheme'];
+} else {
+    $redisUrl = '';
+    $redisHost = '';
+    $redisUser = '';
+    $redisPport = '';
+    $redisPassword = '';
+    $redisDatabase = '';
+}
 
 return [
 
