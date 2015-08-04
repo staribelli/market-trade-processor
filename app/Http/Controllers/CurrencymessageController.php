@@ -14,6 +14,60 @@ use LRedis;
 class CurrencymessageController extends Controller
 {
     /**
+     * Init the index view with the current
+     * average rate data stored in the db.
+     *
+     * @return Response
+     */
+    public function index()
+    {
+        // Select the rates of the year 2015.
+        // NOTE: Just for the purpose of the exercise,
+        // would be nicer to provide all the results available
+        // grouped accordingly
+        $rates = Db::table('monthly_rates')
+            ->select('currency_from', 'currency_to', 'month', 'avg_rate')
+            ->where('year', 2015)
+            ->orderBy('currency_from')
+            ->orderBy('currency_to')
+            ->get();
+
+        // Initialize the messages array as charts.js expects it
+        if (empty($rates))
+        {
+            $messages = [[]];
+        } else {
+            $messages = [];
+        }
+
+        $monthRates = [];
+        $totRates = count($rates);
+
+        // Aggregate the messages as an array
+        // currencyfrom_currencyto => [1 => avg_rate, 2 => ...]
+        // where the inner array index corresponds to a month
+        for ($i = 0; $i < $totRates; $i++) {
+            $rate = $rates[$i];
+            $monthRates[$rate->month] = $rate->avg_rate;
+
+            if ($i == $totRates - 1) {
+                $key = $rate->currency_from . '-' . $rate->currency_to;
+                $messages[$key] = $monthRates;
+            }
+            elseif ($rate->currency_from != $rates[$i + 1]->currency_from
+                    || $rate->currency_to != $rates[$i + 1]->currency_to)
+            {
+                        // Build the array key and store the data
+                        $key = $rate->currency_from . '-' . $rate->currency_to;
+                        $messages[$key] = $monthRates;
+                        $monthRates = [];
+            }
+        }
+
+        return view('socket', compact('messages'));
+    }
+
+    /**
      * Store the message received from the api call
      * POST /messages
      * @return Response
@@ -54,6 +108,8 @@ class CurrencymessageController extends Controller
                     // Save all the messages, in case something is wrong and the
                     // statistics need to be recalculated
                     $message->save();
+
+                    Event::fire(new CurrencyMessageReceived($message));
 
                     $response = response()->make(null, 201);
 

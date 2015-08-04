@@ -12,3 +12,4 @@
 */
 
 Route::post('messages', ['middleware' => 'auth.basic', 'uses' => 'CurrencymessageController@store']);
+Route::get('messages', 'CurrencymessageController@index');
