@@ -115,7 +115,7 @@
 
   app.factory('socket', function ($rootScope) {
     // TODO: The port shouldn't be static, neither the url
-    var socket = io.connect('//rocky-escarpment-4810.herokuapp.com:3000');
+    var socket = io.connect('//fathomless-sands-9410.herokuapp.com/');
     return {
       on: function (eventName, callback) {
         socket.on(eventName, function () {
